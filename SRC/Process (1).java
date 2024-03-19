@@ -1,5 +1,5 @@
 // Clase para representar un proceso
-public class Process {
+public class Process implements Comparable<Process>{
     // Atributos de un proceso
     private int id; // Identificador único del proceso
     private String name; // Nombre del proceso
@@ -82,5 +82,10 @@ public class Process {
     }
     public int getLast_execution_time(){
         return last_execution_time;
+    }
+
+    @Override
+    public int compareTo(Process other_process){
+        return Integer.compare(this.arrive_time, other_process.getArrive_time());
     }
 }
