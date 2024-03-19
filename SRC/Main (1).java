@@ -132,9 +132,9 @@ public class Main {
             wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
             printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
 
-            if(flag == true){
-                System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
-
+            if(process_ready != null){
+                System.out.println("Subio el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
+                wait(1400);
             }
         }
         System.out.println("NO HAY MAS PROCESOS."); // Indicar que no hay más procesos para ejecutar
@@ -147,6 +147,7 @@ public class Main {
             sort_array.remove(0);
             return process_aux;
         }
+        return null;
     }
 
     private static void printArray(){
