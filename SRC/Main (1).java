@@ -1,11 +1,14 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 //import org.fusesource.jansi.AnsiConsole;
 
 // Clase principal
 public class Main {
     // Declaración de dos listas dinámicas para manejar los procesos en cola y en memoria
+    static ArrayList sort_array = new ArrayList();
     static Dinamic_List ready_queue = new Dinamic_List();
     static Dinamic_List memory = new Dinamic_List();
+    int execution_counter = 0;
 
     // Método principal
     public static void main(String[] args) {
@@ -42,12 +45,21 @@ public class Main {
             process.setPriority(scanner.nextInt()); // Asignar prioridad al proceso
             System.out.println("Tiempo de llegada: ");
             process.setArrive_time(scanner.nextInt()); // Asignar tiempo de llegada al proceso
-            ready_queue.add(process); // Agregar proceso a la cola de procesos listos
-            System.out.println("Imprimiendo Cola de procesos Listos.");
-            ready_queue.printList(); // Imprimir la cola de procesos listos
+            sort_queue.add(process);
+            //ready_queue.add(process); // Agregar proceso a la cola de procesos listos
+            System.out.println("Imprimiendo Lista de Procesos.");
+            printArray();
+            //ready_queue.printList(); // Imprimir la cola de procesos listos
             System.out.println("");
         }
         scanner.close(); // Cerrar el scanner después de haber recolectado todos los datos
+        Collections.sort(sort_array);   // Se ordenan los procesos *creo*
+
+        // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
+        Process first_process = sort_array.get(0);
+        sort_array.remove(0);
+        execution_counter += first_process.getExecution_time;
+        System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
 
         System.out.println("Preparando Procesos... ");
         wait(1500); // Esperar un tiempo para simular la preparación de procesos
@@ -99,6 +111,8 @@ public class Main {
                 System.out.println("P"+running_process.getId()+" en ejecución "+running_process_exec_time+" msg");
                 aux--; // Decrementar el contador de quantum
                 running_process_exec_time--; // Decrementar el tiempo de ejecución restante del proceso
+                execution_counter++;
+                boolean flag = checkIfProcessArrives();
                 wait(1400); // Esperar un tiempo para simular la ejecución del proceso
             }
 
@@ -119,6 +133,21 @@ public class Main {
             printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
         }
         System.out.println("NO HAY MAS PROCESOS."); // Indicar que no hay más procesos para ejecutar
+    }
+
+    private static boolean checkIfProcessArrives(){
+        Process process_aux = sort_array.get(0);
+        if(execution_counter == sort_array.get(0).getArriveTime()){
+        
+            return true;
+        }
+        return false;
+    }
+
+    private static void printArray(){
+        for(int i=0; i<sort_array.size(); i++){
+            System.out.print("[" + sort_array.get(i) + "]");
+        }
     }
 
     // Método para pausar la ejecución por un número dado de milisegundos
