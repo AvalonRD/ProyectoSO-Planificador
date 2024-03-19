@@ -1,14 +1,14 @@
 import java.util.Scanner;
-import java.util.ArrayList;
+import java.util.*;
 //import org.fusesource.jansi.AnsiConsole;
 
 // Clase principal
 public class Main {
     // Declaración de dos listas dinámicas para manejar los procesos en cola y en memoria
-    static ArrayList sort_array = new ArrayList();
+    static ArrayList<Process> sort_array = new ArrayList<>();
     static Dinamic_List ready_queue = new Dinamic_List();
     static Dinamic_List memory = new Dinamic_List();
-    int execution_counter = 0;
+    static int execution_counter = 0;
 
     // Método principal
     public static void main(String[] args) {
@@ -45,7 +45,7 @@ public class Main {
             process.setPriority(scanner.nextInt()); // Asignar prioridad al proceso
             System.out.println("Tiempo de llegada: ");
             process.setArrive_time(scanner.nextInt()); // Asignar tiempo de llegada al proceso
-            sort_queue.add(process);
+            sort_array.add(process);
             //ready_queue.add(process); // Agregar proceso a la cola de procesos listos
             System.out.println("Imprimiendo Lista de Procesos.");
             printArray();
@@ -53,13 +53,19 @@ public class Main {
             System.out.println("");
         }
         scanner.close(); // Cerrar el scanner después de haber recolectado todos los datos
-        Collections.sort(sort_array);   // Se ordenan los procesos *creo*
+        Collections.sort(sort_array, new Comparator<Process>(){
+            @Override
+            public int compare(Process p1, Process p2){
+                return Integer.compare(p1.getArrive_time(),p2.getArrive_time());
+            }
+        }); // Se ordenan los procesos *creo*
 
         // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
         Process first_process = sort_array.get(0);
         sort_array.remove(0);
-        execution_counter += first_process.getExecution_time;
+        execution_counter += first_process.getExecution_time();
         System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
+        ready_queue.add(first_process);
 
         System.out.println("Preparando Procesos... ");
         wait(1500); // Esperar un tiempo para simular la preparación de procesos
@@ -107,12 +113,13 @@ public class Main {
 
             // Simulación de la ejecución del proceso
             int running_process_exec_time = running_process.getExecution_time_remaining();
+            Process process_ready = null;
             while(aux > 0 && running_process_exec_time > 0) {
                 System.out.println("P"+running_process.getId()+" en ejecución "+running_process_exec_time+" msg");
                 aux--; // Decrementar el contador de quantum
                 running_process_exec_time--; // Decrementar el tiempo de ejecución restante del proceso
                 execution_counter++;
-                Process process_ready = checkIfProcessArrives();
+                process_ready = checkIfProcessArrives();
                 wait(1400); // Esperar un tiempo para simular la ejecución del proceso
             }
 
@@ -126,6 +133,9 @@ public class Main {
             } else {
                 System.out.println("Finalizó la ejecución del proceso "+running_process.getId()+".");
                 wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
+                if(sort_array.isEmpty()){
+                    
+                }
             }
             memory_size += running_process.getSize(); // Aumentar el tamaño de la memoria disponible después de liberar el proceso
             System.out.println("Proceso "+running_process.getId()+" liberado de la memoria, quedan "+memory_size+" unidades de memoria");
@@ -142,7 +152,7 @@ public class Main {
 
     private static Process checkIfProcessArrives(){
         Process process_aux = sort_array.get(0);
-        if(execution_counter == sort_array.get(0).getArriveTime()){
+        if(execution_counter == sort_array.get(0).getArrive_time()){
             ready_queue.add(process_aux);
             sort_array.remove(0);
             return process_aux;
@@ -152,7 +162,7 @@ public class Main {
 
     private static void printArray(){
         for(int i=0; i<sort_array.size(); i++){
-            System.out.print("[" + sort_array.get(i) + "]");
+            System.out.print("[" + sort_array.get(i).getId() + "]");
         }
     }
 
