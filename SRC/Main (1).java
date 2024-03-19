@@ -112,7 +112,7 @@ public class Main {
                 aux--; // Decrementar el contador de quantum
                 running_process_exec_time--; // Decrementar el tiempo de ejecución restante del proceso
                 execution_counter++;
-                boolean flag = checkIfProcessArrives();
+                Process process_ready = checkIfProcessArrives();
                 wait(1400); // Esperar un tiempo para simular la ejecución del proceso
             }
 
@@ -131,17 +131,22 @@ public class Main {
             System.out.println("Proceso "+running_process.getId()+" liberado de la memoria, quedan "+memory_size+" unidades de memoria");
             wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
             printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
+
+            if(flag == true){
+                System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
+
+            }
         }
         System.out.println("NO HAY MAS PROCESOS."); // Indicar que no hay más procesos para ejecutar
     }
 
-    private static boolean checkIfProcessArrives(){
+    private static Process checkIfProcessArrives(){
         Process process_aux = sort_array.get(0);
         if(execution_counter == sort_array.get(0).getArriveTime()){
-        
-            return true;
+            ready_queue.add(process_aux);
+            sort_array.remove(0);
+            return process_aux;
         }
-        return false;
     }
 
     private static void printArray(){
