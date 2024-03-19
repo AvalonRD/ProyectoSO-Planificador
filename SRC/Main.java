@@ -62,6 +62,7 @@ public class Main {
 
         // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
         Process first_process = sort_array.get(0);
+        System.out.println("¨¨");
         sort_array.remove(0);
         execution_counter += first_process.getExecution_time();
         System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
@@ -133,8 +134,11 @@ public class Main {
             } else {
                 System.out.println("Finalizó la ejecución del proceso "+running_process.getId()+".");
                 wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
-                if(sort_array.isEmpty()){
-                    
+                if((ready_queue.getNode_head() == null && memory.getNode_head() == null) && !sort_array.isEmpty()){
+                    execution_counter = sort_array.get(0).getArrive_time();
+                    process_ready = sort_array.get(0);
+                    sort_array.remove(0);
+                    ready_queue.add(process_ready);
                 }
             }
             memory_size += running_process.getSize(); // Aumentar el tamaño de la memoria disponible después de liberar el proceso
