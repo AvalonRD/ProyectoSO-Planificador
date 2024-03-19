@@ -1,2 +1,2 @@
 # ProyectoSO-Planificador
-Simulador Procesos monohilo
+Simulador Procesos monomono
