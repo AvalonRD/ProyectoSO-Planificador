@@ -6,8 +6,10 @@ public class Process {
     private int size; // Tamaño del proceso
     private int execution_time; // Tiempo total de ejecución del proceso
     private int execution_time_remaining; // Tiempo restante de ejecución del proceso
-    private int priority; // Prioridad del proceso
+    //private int priority; // Prioridad del proceso
     private int arrive_time; // Tiempo de llegada del proceso
+    private int first_top;  // Tiempo en el que sube por primera vez
+    private int last_execution_time;    // Ultimo tiempo de finalización del proceso
 
     // Constructor que inicializa todos los atributos de un proceso
     public Process(int id, String name, int size, int execution_time, int priority, int arrive_time) {
@@ -18,6 +20,8 @@ public class Process {
         this.execution_time_remaining = execution_time;
         this.priority = priority;
         this.arrive_time = arrive_time;
+        this.first_top = null;
+        this.last_execution_time = null;
     }
 
     // Constructor por defecto
@@ -66,5 +70,17 @@ public class Process {
     }
     public void setArrive_time(int arrive_time) {
         this.arrive_time = arrive_time;
+    }
+    public void setFirst_top(int first_top){
+        this.first_top = first_top;
+    }
+    public int getFirst_top(){
+        return first_top;
+    }
+    public void setLast_execution_time(int last_execution_time){
+        this.last_execution_time = last_execution_time;
+    }
+    public int getLast_execution_time(){
+        return last_execution_time;
     }
 }
