@@ -9,6 +9,7 @@ public class Main {
     static Dinamic_List ready_queue = new Dinamic_List();
     static Dinamic_List memory = new Dinamic_List();
     static int execution_counter = 0;
+    static Process process_arrives_aux = null;
 
     // Método principal
     public static void main(String[] args) {
@@ -59,14 +60,17 @@ public class Main {
                 return Integer.compare(p1.getArrive_time(),p2.getArrive_time());
             }
         }); // Se ordenan los procesos *creo*
+        System.out.println("Imprimiendo Lista de Procesos Ordenados.");
+        printArray();
 
         // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
         Process first_process = sort_array.get(0);
-        System.out.println("¨¨");
+        System.out.println("s{" + sort_array.get(0).getId() + "}");
         sort_array.remove(0);
-        execution_counter += first_process.getExecution_time();
+        execution_counter += first_process.getArrive_time();
         System.out.println("Subio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
         ready_queue.add(first_process);
+        System.out.println("s{" + sort_array.get(0).getId() + "}");
 
         System.out.println("Preparando Procesos... ");
         wait(1500); // Esperar un tiempo para simular la preparación de procesos
@@ -119,8 +123,9 @@ public class Main {
                 System.out.println("P"+running_process.getId()+" en ejecución "+running_process_exec_time+" msg");
                 aux--; // Decrementar el contador de quantum
                 running_process_exec_time--; // Decrementar el tiempo de ejecución restante del proceso
-                execution_counter++;
                 process_ready = checkIfProcessArrives();
+                execution_counter++;
+                System.out.println("*"+execution_counter+"*");
                 wait(1400); // Esperar un tiempo para simular la ejecución del proceso
             }
 
@@ -135,19 +140,29 @@ public class Main {
                 System.out.println("Finalizó la ejecución del proceso "+running_process.getId()+".");
                 wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
                 if((ready_queue.getNode_head() == null && memory.getNode_head() == null) && !sort_array.isEmpty()){
+                    System.out.println("sl{" + sort_array.get(0).getId() + "}");
                     execution_counter = sort_array.get(0).getArrive_time();
                     process_ready = sort_array.get(0);
                     sort_array.remove(0);
                     ready_queue.add(process_ready);
+                    System.out.println("sl{" + sort_array.get(0).getId() + "}");
                 }
             }
             memory_size += running_process.getSize(); // Aumentar el tamaño de la memoria disponible después de liberar el proceso
             System.out.println("Proceso "+running_process.getId()+" liberado de la memoria, quedan "+memory_size+" unidades de memoria");
+            System.out.println("^["+process_ready+"]");
             wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
             printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
 
+            if(process_arrives_aux != null){
+                process_ready = process_arrives_aux;
+            }
+
             if(process_ready != null){
+                System.out.println("s{" + sort_array.get(0).getId() + "}");
                 System.out.println("Subio el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
+                System.out.println("s{" + sort_array.get(0).getId() + "}");
+                process_ready = null;
                 wait(1400);
             }
         }
@@ -155,8 +170,15 @@ public class Main {
     }
 
     private static Process checkIfProcessArrives(){
+        if(sort_array.isEmpty()){
+            return null;
+        }
+        System.out.println("sm{" + sort_array.get(0).getId() + "}");
         Process process_aux = sort_array.get(0);
         if(execution_counter == sort_array.get(0).getArrive_time()){
+            if(sort_array.size() == 1){
+                 process_arrives_aux = process_aux;
+            }
             ready_queue.add(process_aux);
             sort_array.remove(0);
             return process_aux;
