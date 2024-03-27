@@ -4,6 +4,9 @@ import java.util.*;
 
 // Clase principal
 public class Main {
+    static double totalWaitingTime  = 0;
+    static double totalResponseTime = 0;
+    static double totalExecutionTime = 0;
     // Declaración de dos listas dinámicas para manejar los procesos en cola y en memoria
     static ArrayList<Process> sort_array = new ArrayList<>();
     static Dinamic_List ready_queue = new Dinamic_List();
@@ -30,29 +33,82 @@ public class Main {
         System.out.println("Ingrese los siguientes datos para cada proceso.");
 
         // Se recolectan los datos para cada proceso y se agregan a la cola de procesos listos
-        for(int i = 0; i < total_processes; i++ ) {
+        for (int i = 0; i < total_processes; i++) {
             Process process = new Process(); // Crear un nuevo proceso
-            System.out.println("Proceso " + i + ".");
-            System.out.println("Id: ");
-            process.setId(scanner.nextInt()); // Asignar ID al proceso
-            scanner.nextLine();
+
+            // Capturar el ID del proceso
+            while (true) {
+                try {
+                    System.out.println("Proceso " + i + ".");
+                    System.out.println("Id: ");
+                    process.setId(scanner.nextInt()); // Asignar ID al proceso
+                    break; // Salir del bucle si se ingresó un valor válido
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Error: Ingresa un valor numérico para el ID.");
+                    scanner.nextLine(); // Limpiar el búfer del escáner
+                }
+            }
+
+            scanner.nextLine(); // Limpiar el búfer del escáner
+
+            // Capturar el nombre del proceso
             System.out.println("Nombre: ");
             process.setName(scanner.nextLine()); // Asignar nombre al proceso
-            System.out.println("Tamaño: ");
-            process.setSize(scanner.nextInt()); // Asignar tamaño al proceso
-            System.out.println("Tiempo de ejecución: ");
-            process.setExecution_time(scanner.nextInt()); // Asignar tiempo de ejecución al proceso
-            System.out.println("Prioridad: ");
-            process.setPriority(scanner.nextInt()); // Asignar prioridad al proceso
-            System.out.println("Tiempo de llegada: ");
-            process.setArrive_time(scanner.nextInt()); // Asignar tiempo de llegada al proceso
+
+            // Capturar el tamaño del proceso
+            while (true) {
+                try {
+                    System.out.println("Tamaño: ");
+                    process.setSize(scanner.nextInt()); // Asignar tamaño al proceso
+                    break; // Salir del bucle si se ingresó un valor válido
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Error: Ingresa un valor numérico para el tamaño.");
+                    scanner.nextLine(); // Limpiar el búfer del escáner
+                }
+            }
+
+            // Capturar el tiempo de ejecución del proceso
+            while (true) {
+                try {
+                    System.out.println("Tiempo de ejecución: ");
+                    process.setExecution_time(scanner.nextInt()); // Asignar tiempo de ejecución al proceso
+                    break; // Salir del bucle si se ingresó un valor válido
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Error: Ingresa un valor numérico para el tiempo de ejecución.");
+                    scanner.nextLine(); // Limpiar el búfer del escáner
+                }
+            }
+
+            // Capturar la prioridad del proceso
+            while (true) {
+                try {
+                    System.out.println("Prioridad: ");
+                    process.setPriority(scanner.nextInt()); // Asignar prioridad al proceso
+                    break; // Salir del bucle si se ingresó un valor válido
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Error: Ingresa un valor numérico para la prioridad.");
+                    scanner.nextLine(); // Limpiar el búfer del escáner
+                }
+            }
+
+            // Capturar el tiempo de llegada del proceso
+            while (true) {
+                try {
+                    System.out.println("Tiempo de llegada: ");
+                    process.setArrive_time(scanner.nextInt()); // Asignar tiempo de llegada al proceso
+                    break; // Salir del bucle si se ingresó un valor válido
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Error: Ingresa un valor numérico para el tiempo de llegada.");
+                    scanner.nextLine(); // Limpiar el búfer del escáner
+                }
+            }
+
             sort_array.add(process);
-            //ready_queue.add(process); // Agregar proceso a la cola de procesos listos
             System.out.println("Imprimiendo Lista de Procesos.");
             printArray();
-            //ready_queue.printList(); // Imprimir la cola de procesos listos
             System.out.println("");
         }
+
         scanner.close(); // Cerrar el scanner después de haber recolectado todos los datos
         Collections.sort(sort_array, new Comparator<Process>(){
             @Override
@@ -128,6 +184,17 @@ public class Main {
                 //System.out.println("*"+execution_counter+"*");
                 wait(1400); // Esperar un tiempo para simular la ejecución del proceso
             }
+            // Calcular el tiempo de espera
+            int waitingTime = execution_counter - running_process.getArrive_time();
+            totalWaitingTime += waitingTime;
+
+            // Calcular el tiempo de respuesta
+            int responseTime = execution_counter - running_process.getArrive_time();
+            totalResponseTime += responseTime;
+
+            // Calcular el tiempo de ejecución
+            int executionTime = running_process.getExecution_time() - running_process.getExecution_time_remaining();
+            totalExecutionTime += executionTime;
 
             // Verificar si el proceso terminó su ejecución o si aún le queda tiempo
             if(running_process_exec_time > 0) {
@@ -161,6 +228,7 @@ public class Main {
                 //System.out.println("s{" + sort_array.get(0).getId() + "}");
                 System.out.println("Subio el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
                 //System.out.println("s{" + sort_array.get(0).getId() + "}");
+
                 //process_ready = null;
                 wait(1400);
             }
@@ -168,6 +236,15 @@ public class Main {
             printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
         }
         System.out.println("NO HAY MAS PROCESOS."); // Indicar que no hay más procesos para ejecutar
+
+        double avgWaitingTime = totalWaitingTime / total_processes;
+        double avgResponseTime = totalResponseTime / total_processes;
+        double avgExecutionTime = totalExecutionTime / total_processes;
+
+        // Imprime los promedios
+        System.out.println("\nPromedio de Tiempo de Espera: " + avgWaitingTime);
+        System.out.println("Promedio de Tiempo de Respuesta: " + avgResponseTime);
+        System.out.println("Promedio de Tiempo de Ejecución: " + avgExecutionTime);
     }
 
     private static Process checkIfProcessArrives(){
