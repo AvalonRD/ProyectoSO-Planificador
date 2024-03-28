@@ -142,4 +142,9 @@ public class Dinamic_List {
     public void setSize(int size) {
         this.size = size;
     }
+
+    // Método para verificar si la lista está vacía
+    public boolean isEmpty() {
+        return node_head == null;
+    }
 }
