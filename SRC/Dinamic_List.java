@@ -147,4 +147,6 @@ public class Dinamic_List {
     public boolean isEmpty() {
         return node_head == null;
     }
+    //cambios realizados
+    int hola = 123;
 }
