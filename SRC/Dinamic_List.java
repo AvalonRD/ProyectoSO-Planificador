@@ -1,145 +1,237 @@
-// Clase para implementar una lista dinámica
-public class Dinamic_List {
-    // Nodo inicial de la lista
-    private Node node_head;
-    // Tamaño de la lista
-    private int size = 0;
+import java.util.Scanner;
+import java.util.*;
+//import org.fusesource.jansi.AnsiConsole;
 
-    // Clase interna para representar un nodo de la lista
-    private static class Node {
-        // Elemento almacenado en el nodo
-        private Process item;
-        // Referencia al siguiente nodo en la lista
-        private Node next;
-        // Referencia al nodo anterior en la lista
-        private Node prev;
+// Clase principal
+public class Main {
+    // Declaración de dos listas dinámicas para manejar los procesos en cola y en memoria
+    static ArrayList<Process> sort_array = new ArrayList<>();
+    static Dinamic_List ready_queue = new Dinamic_List();
+    static Dinamic_List memory = new Dinamic_List();
+    static int execution_counter = 0;
+    static Process process_arrives_aux = null;
 
-        // Constructor de la clase Node
-        public Node(Process process) {
-            this.item = process;
-            this.next = null;
-            this.prev = null;
+    // Método principal
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Inicia la etapa de recolección de datos
+        System.out.println("Gestor de Procesos");
+        System.out.println("Simulador de Planificador de Procesos");
+        System.out.println("Bienvenido");
+        System.out.println("Indica el tamaño de la memoria: ");
+        int memory_size = scanner.nextInt(); // Tamaño de la memoria del sistema
+        System.out.println("Indica el Quantum para los procesos: ");
+        int quantum = scanner.nextInt(); // Tamaño del quantum para el planificador
+        System.out.println("Cuantos procesos deseas planificar?: ");
+        int total_processes = scanner.nextInt(); // Número total de procesos a planificar
+
+        System.out.println("Captura de los Datos de Cada Proceso.");
+        System.out.println("Ingrese los siguientes datos para cada proceso.");
+
+        // Se recolectan los datos para cada proceso y se agregan a la cola de procesos listos
+        for(int i = 0; i < total_processes; i++ ) {
+            Process process = new Process(); // Crear un nuevo proceso
+            System.out.println("Proceso " + i + ".");
+            System.out.println("Id: ");
+            process.setId(scanner.nextInt()); // Asignar ID al proceso
+            scanner.nextLine();
+            System.out.println("Nombre: ");
+            process.setName(scanner.nextLine()); // Asignar nombre al proceso
+            System.out.println("Tamaño: ");
+            process.setSize(scanner.nextInt()); // Asignar tamaño al proceso
+            System.out.println("Tiempo de ejecución: ");
+            process.setExecution_time(scanner.nextInt()); // Asignar tiempo de ejecución al proceso
+            System.out.println("Prioridad: ");
+            process.setPriority(scanner.nextInt()); // Asignar prioridad al proceso
+            System.out.println("Tiempo de llegada: ");
+            process.setArrive_time(scanner.nextInt()); // Asignar tiempo de llegada al proceso
+            sort_array.add(process);
+            //ready_queue.add(process); // Agregar proceso a la cola de procesos listos
+            System.out.println("Imprimiendo Lista de Procesos.");
+            printArray();
+            ready_queue.printList(); // Imprimir la cola de procesos listos
+            System.out.println("");
         }
+        scanner.close(); // Cerrar el scanner después de haber recolectado todos los datos
 
-        // Método para establecer el siguiente nodo
-        public void setNext(Node next) {
-            this.next = next;
-        }
-
-        // Método para establecer el nodo anterior
-        public void setPrev(Node prev) {
-            this.prev = prev;
-        }
-    }
-
-    // Constructor que inicializa la lista con un nodo inicial dado
-    public Dinamic_List(Process process_head) {
-        Node node = new Node(process_head);
-        this.node_head = node;
-    }
-
-    // Constructor que inicializa una lista vacía
-    public Dinamic_List() {
-        this.node_head = null;
-        this.size = 0;
-    }
-
-    // Método para agregar un proceso al final de la lista
-    public void add(Process process) {
-        // Crear un nuevo nodo con el proceso dado
-        Node new_node = new Node(process);
-
-        // Verificar si la lista está vacía
-        if (this.size <= 0) {
-            // Si la lista está vacía, el nuevo nodo se convierte en el nodo inicial
-            this.node_head = new_node;
-        } else {
-            // Si la lista no está vacía, se recorre la lista hasta llegar al último nodo
-            Node current_node = this.node_head;
-            while (current_node.next != null) {
-                current_node = current_node.next;
+        Collections.sort(sort_array, new Comparator<Process>(){
+            @Override
+            public int compare(Process p1, Process p2){
+                return Integer.compare(p1.getArrive_time(),p2.getArrive_time());
             }
-            // Se enlaza el nuevo nodo al último nodo de la lista
-            current_node.next = new_node;
-            new_node.prev = current_node;
+        }); // Se ordenan los n proceso por la forma de la estructura
+
+        System.out.println("Imprimiendo Lista de Procesos Ordenados.");
+        printArray();
+
+        // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
+        Process first_process = sort_array.get(0);
+        //System.out.println("s{" + sort_array.get(0).getId() + "}");
+        sort_array.remove(0);
+        execution_counter += first_process.getArrive_time();//actualiza el tiempo de partida para el analisis dependiendo del proceso con tiempo de llegada mas corto
+        System.out.println("\nSubio el proceso " + first_process.getId() + " a la cola de procesos listos en el tiempo " + execution_counter);
+        ready_queue.add(first_process);
+        //System.out.println("s{" + sort_array.get(0).getId() + "}");
+
+        System.out.println("Preparando Procesos... ");
+        //wait(1500); // Esperar un tiempo para simular la preparación de procesos
+        System.out.println("Cargando procesos a la memoria.\n");
+        //wait(1500); // Esperar un tiempo para simular la carga de procesos en memoria
+
+
+        // Inicia la etapa para cargar los procesos en cola a la memoria
+        int last_process_id;
+
+        // Ciclo principal que ejecuta la planificación de procesos mientras haya procesos en cola o en memoria
+        while(ready_queue.getNode_head() != null || memory.getNode_head() != null) {
+            // Ciclo para cargar procesos en memoria mientras haya espacio y procesos en cola
+
+            // Verificar si hay procesos nuevos que llegan en el mismo tiempo actual
+            Process process_ready = checkIfProcessArrives();
+            if (process_ready !=null ) {
+                System.out.println("Subió el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
+                ready_queue.add(process_ready);
+                printQueues(); // Imprimir el estado de las colas de procesos después de agregar nuevos procesos
+            }
+
+
+            while((memory_size >= ready_queue.getFirstNodeProcessSize()) && ready_queue.getNode_head() != null ) {
+                System.out.println("\nSubió el proceso "+ready_queue.getFirstNodeProcessId()+" y restan "+(memory_size-ready_queue.getFirstNodeProcessSize())+" unidades de memoria");
+                //wait(1500);
+                printQueues(); // Imprimir el estado de las colas de procesos
+                Process head_process = ready_queue.delete(); // Eliminar el primer proceso de la cola de procesos listos
+                memory.add(head_process); // Agregar el proceso a la memoria
+                memory_size -= head_process.getSize(); // Restar el tamaño del proceso al tamaño de la memoria disponible
+                //wait(1500); // Esperar un tiempo para simular la carga del proceso en memoria
+                System.out.print("\033[" + 1 + "A"); // Mueve el cursor hacia arriba
+                System.out.print("\033[2K"); // Borra la línea
+                //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+                ready_queue.printList(); // Imprimir la cola de procesos listos
+                //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+                System.out.print("\033[" + 3 + "A"); // Mueve el cursor hacia arriba
+                System.out.print("\033[2K"); // Borra la línea
+                //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+                memory.printList(); // Imprimir la memoria
+                //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+                System.out.print("\033[" + (3) + "B"); // Mueve el cursor hacia abajo
+                //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+            }
+
+
+            // Inicia la planificación de los procesos
+            int aux = quantum; // Inicializa el contador de quantum
+            System.out.println("\nInicia la planificación de los procesos ...");
+            //wait(1500); // Esperar un tiempo para simular el inicio de la planificación
+            printQueues(); // Imprimir el estado de las colas de procesos
+            Process running_process = memory.delete(); // Eliminar el proceso de memoria para su ejecución
+            System.out.println("Se planifica P"+running_process.getId()); // Mostrar el proceso que se planificó para ejecución
+            //wait(1500); // Esperar un tiempo para simular la planificación del proceso
+            System.out.println("Cola de procesos listos para su ejecución:");
+            memory.printList(); // Imprimir la memoria después de la planificación
+
+            // Simulación de la ejecución del proceso
+            int running_process_exec_time = running_process.getExecution_time_remaining();
+            while (aux > 0 && running_process_exec_time > 0) {
+                System.out.println("Tiempo -> " + execution_counter + " | " + "P" + running_process.getId() + " en ejecución " + running_process_exec_time + " msg");
+                aux--; // Decrementar el contador de quantum
+                running_process_exec_time--; // Decrementar el tiempo de ejecución restante del proceso
+                process_ready = checkIfProcessArrives();
+                execution_counter++;
+                //System.out.println("*"+execution_counter+"*");
+                //wait(1400); // Esperar un tiempo para simular la ejecución del proceso
+            }
+
+            // Verificar si el proceso terminó su ejecución o si aún le queda tiempo
+            if(running_process_exec_time > 0) {
+                running_process.setExecution_time_remaining(running_process_exec_time); // Actualizar el tiempo de ejecución restante del proceso
+                ready_queue.add(running_process); // Agregar el proceso a la cola de procesos listos
+                System.out.println("Terminó el quantum del proceso "+running_process.getId()+" restan "+running_process.getExecution_time_remaining()+"ms de ejecución");
+                //wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
+                System.out.println("Proceso "+running_process.getId()+" agregado a la cola de procesos listos.");
+            } else {
+                System.out.println("Finalizó la ejecución del proceso "+running_process.getId()+".");
+                //wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
+                if((ready_queue.getNode_head() == null && memory.getNode_head() == null) && !sort_array.isEmpty()){
+                    System.out.println("sl{" + sort_array.get(0).getId() + "}");
+                    execution_counter = sort_array.get(0).getArrive_time();
+                    process_ready = sort_array.get(0);
+                    sort_array.remove(0);
+                    ready_queue.add(process_ready);
+                    //System.out.println("sl{" + sort_array.get(0).getId() + "}");
+                }
+            }
+            memory_size += running_process.getSize(); // Aumentar el tamaño de la memoria disponible después de liberar el proceso
+            System.out.println("Proceso "+running_process.getId()+" liberado de la memoria, quedan "+memory_size+" unidades de memoria");
+            //System.out.println("^["+process_ready+"]");
+            //wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
+
+            if(process_arrives_aux != null){
+                process_ready = process_arrives_aux;
+            }
+
+            if(process_ready != null){
+                //System.out.println("s{" + sort_array.get(0).getId() + "}");
+                System.out.println("Subio el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
+                //System.out.println("s{" + sort_array.get(0).getId() + "}");
+                //process_ready = null;
+                //wait(1400);
+            }
+
+            printQueues(); // Imprimir el estado de las colas de procesos después de la ejecución del proceso
         }
-        // Se incrementa el tamaño de la lista
-        this.size++;
+        System.out.println("NO HAY MAS PROCESOS."); // Indicar que no hay más procesos para ejecutar
     }
 
-    // Método para eliminar y devolver el primer proceso de la lista
-    public Process delete() {
-        // Obtener una referencia al nodo inicial de la lista
-        Node node = node_head;
-
-        // Verificar si el nodo inicial tiene un siguiente nodo
-        if (node_head.next == null) {
-            // Si el nodo inicial no tiene un siguiente nodo, la lista se vacía
-            node_head = null;
-        } else {
-            // Si el nodo inicial tiene un siguiente nodo, se actualiza el nodo inicial
-            node_head = node_head.next;
-            node_head.prev = null;
+    private static Process checkIfProcessArrives() {
+        if (sort_array.isEmpty()) {
+            return null;
         }
-        // Se decrementa el tamaño de la lista
-        this.size--;
-        // Se devuelve el proceso almacenado en el nodo eliminado
-        return node.item;
-    }
-
-    // Método para imprimir los elementos de la lista
-    public void printList() {
-        // Inicializar un nodo actual para recorrer la lista desde el nodo inicial
-        Node current_node = this.node_head;
-
-        // Recorrer la lista e imprimir los ID de los procesos almacenados en cada nodo
-        while (current_node != null) {
-            System.out.print("[" + current_node.item.getId() + "]");
-            current_node = current_node.next;
+        Process process_aux = sort_array.get(0);
+        if (execution_counter == process_aux.getArrive_time()) {
+            if (sort_array.size() == 1) {
+                process_arrives_aux = process_aux;
+            }
+            sort_array.remove(0);
+            return process_aux;
         }
-        // Imprimir una nueva línea para formatear la salida
-        System.out.println("");
+        return null;
     }
 
-    // Método para obtener el tamaño del primer proceso en la lista
-    public int getFirstNodeProcessSize() {
-        // Verificar si la lista no está vacía
-        if (node_head != null) {
-            // Si la lista no está vacía, devolver el tamaño del proceso almacenado en el nodo inicial
-            return node_head.item.getSize();
+
+    private static void printArray(){
+        for(int i=0; i<sort_array.size(); i++){
+            System.out.print("[" + sort_array.get(i).getId() + "]");
         }
-        // Si la lista está vacía, devolver -1 para indicar que no hay procesos
-        return -1;
     }
 
-    // Método para obtener el ID del primer proceso en la lista
-    public int getFirstNodeProcessId() {
-        // Verificar si la lista no está vacía
-        if (node_head != null) {
-            // Si la lista no está vacía, devolver el ID del proceso almacenado en el nodo inicial
-            return node_head.item.getId();
-        }
-        // Si la lista está vacía, devolver -1 para indicar que no hay procesos
-        return -1;
+    // Método para pausar la ejecución por un número dado de milisegundos
+    private static void wait(int miliseconds) {
+        try {
+        Thread.sleep(miliseconds); // Pausar la ejecución por el número dado de milisegundos
+    } catch (InterruptedException e) {
+        e.printStackTrace(); // Manejar la excepción en caso de interrupción
     }
+}
 
-    // Método getter para obtener el nodo inicial de la lista
-    public Node getNode_head() {
-        return this.node_head;
-    }
+// Método para imprimir las colas de procesos listos
+private static void printQueues() {
+    System.out.println("\nCola de procesos listos para su ejecución:");
+    memory.printList(); // Imprimir la memoria
+    //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+    System.out.println("Cola de procesos Listos:");
+    ready_queue.printList(); // Imprimir la cola de procesos listos
+    //wait(1500); // Esperar un tiempo para simular la actualización de la pantalla
+}
 
-    // Método setter para establecer el nodo inicial de la lista
-    public void setNode_head(Node node_head) {
-        this.node_head = node_head;
-    }
-
-    // Método getter para obtener el tamaño de la lista
-    public int getSize() {
-        return size;
-    }
-
-    // Método setter para establecer el tamaño de la lista
-    public void setSize(int size) {
-        this.size = size;
-    }
+// Método para borrar una línea de la consola (no está siendo utilizado en el código principal)
+public static void deleteLine(int line) {
+    System.out.print("\033[" + line + "A"); // Mueve el cursor hacia arriba
+    System.out.print("\033[2K"); // Borra la línea
+    //wait(1000); // Esperar un tiempo para simular la actualización de la pantalla
+    System.out.println("Hola");
+    System.out.print("\033[" + (line-1) + "B"); // Mueve el cursor hacia abajo
+    System.out.println("Hola");
+    System.out.flush();
+}
 }
