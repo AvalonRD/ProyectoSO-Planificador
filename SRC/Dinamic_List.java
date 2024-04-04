@@ -21,14 +21,22 @@ public class Dinamic_List {
             this.prev = null;
         }
 
-        // Método para establecer el siguiente nodo
+        // Métodos getter y setter para el siguiente nodo
         public void setNext(Node next) {
             this.next = next;
         }
 
-        // Método para establecer el nodo anterior
+        public Node getNext() {
+            return next;
+        }
+
+        // Métodos getter y setter para el nodo anterior
         public void setPrev(Node prev) {
             this.prev = prev;
+        }
+
+        public Node getPrev() {
+            return prev;
         }
     }
 
@@ -56,12 +64,12 @@ public class Dinamic_List {
         } else {
             // Si la lista no está vacía, se recorre la lista hasta llegar al último nodo
             Node current_node = this.node_head;
-            while (current_node.next != null) {
-                current_node = current_node.next;
+            while (current_node.getNext() != null) {
+                current_node = current_node.getNext();
             }
             // Se enlaza el nuevo nodo al último nodo de la lista
-            current_node.next = new_node;
-            new_node.prev = current_node;
+            current_node.setNext(new_node);
+            new_node.setPrev(current_node);
         }
         // Se incrementa el tamaño de la lista
         this.size++;
@@ -73,13 +81,13 @@ public class Dinamic_List {
         Node node = node_head;
 
         // Verificar si el nodo inicial tiene un siguiente nodo
-        if (node_head.next == null) {
+        if (node_head.getNext() == null) {
             // Si el nodo inicial no tiene un siguiente nodo, la lista se vacía
             node_head = null;
         } else {
             // Si el nodo inicial tiene un siguiente nodo, se actualiza el nodo inicial
-            node_head = node_head.next;
-            node_head.prev = null;
+            node_head = node_head.getNext();
+            node_head.setPrev(null);
         }
         // Se decrementa el tamaño de la lista
         this.size--;
@@ -95,10 +103,15 @@ public class Dinamic_List {
         // Recorrer la lista e imprimir los ID de los procesos almacenados en cada nodo
         while (current_node != null) {
             System.out.print("[" + current_node.item.getId() + "]");
-            current_node = current_node.next;
+            current_node = current_node.getNext();
         }
         // Imprimir una nueva línea para formatear la salida
         System.out.println("");
+    }
+
+    // Método para verificar si la lista está vacía
+    public boolean isEmpty() {
+        return size == 0 && node_head == null;
     }
 
     // Método para obtener el tamaño del primer proceso en la lista
@@ -143,4 +156,3 @@ public class Dinamic_List {
         this.size = size;
     }
 }
-

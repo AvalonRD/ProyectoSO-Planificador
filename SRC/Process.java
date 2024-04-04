@@ -1,15 +1,18 @@
 // Clase para representar un proceso
 public class Process {
     // Atributos de un proceso
-    private int id; // Identificador único del proceso
-    private String name; // Nombre del proceso
-    private int size; // Tamaño del proceso
-    private int execution_time; // Tiempo total de ejecución del proceso
-    private int execution_time_remaining; // Tiempo restante de ejecución del proceso
-    private int priority; // Prioridad del proceso
-    private int arrive_time; // Tiempo de llegada del proceso
-    private int first_top;  // Tiempo en el que sube por primera vez
-    private int last_execution_time;    // Ultimo tiempo de finalización del proceso
+    private int id;
+    private String name;
+    private int size;
+    private int execution_time;
+    private int execution_time_remaining;
+    private int priority;
+    private int arrive_time;
+    private int first_top;
+    private int last_execution_time;
+    private int waitingTime; // Tiempo de espera
+    private int responseTime; // Tiempo de respuesta
+    private int turnaroundTime; // Tiempo de ejecución
 
     // Constructor que inicializa todos los atributos de un proceso
     public Process(int id, String name, int size, int execution_time, int priority, int arrive_time) {
@@ -22,6 +25,9 @@ public class Process {
         this.arrive_time = arrive_time;
         this.first_top = 0;
         this.last_execution_time = 0;
+        this.waitingTime = 0;
+        this.responseTime = 0;
+        this.turnaroundTime = 0;
     }
 
     // Constructor por defecto
@@ -82,5 +88,23 @@ public class Process {
     }
     public int getLast_execution_time(){
         return last_execution_time;
+    }
+    public int getWaitingTime() {
+        return waitingTime;
+    }
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+    public int getResponseTime() {
+        return responseTime;
+    }
+    public void setResponseTime(int responseTime) {
+        this.responseTime = responseTime;
+    }
+    public int getTurnaroundTime() {
+        return turnaroundTime;
+    }
+    public void setTurnaroundTime(int turnaroundTime) {
+        this.turnaroundTime = turnaroundTime;
     }
 }
