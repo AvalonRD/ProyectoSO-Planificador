@@ -163,7 +163,7 @@ public class Main {
                 wait(1400); // Esperar un tiempo para simular la actualización de la pantalla
 
                 // TESP
-                average_wait_time += running_process.getMax_wait_time() - running_process.getArrive_time() - running_process.getExecution_time_remaining();
+                average_wait_time += running_process.getMax_wait_time() - running_process.getArrive_time() - (running_process.getExecution_time_remaining()-running_process.getExecution_time());
                 // 
 
                 // TRES
