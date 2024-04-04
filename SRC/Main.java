@@ -74,13 +74,22 @@ public class Main {
         System.out.println("Preparando Procesos... ");
 
         while (ready_queue.getNode_head() != null || memory.getNode_head() != null) {
-            Process process_ready = checkIfProcessArrives();
-            if (process_ready != null) {
-                System.out.println("Subió el proceso " + process_ready.getId()
-                        + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
-                ready_queue.add(process_ready);
-                printQueues();
+            
+            // Ciclo para cargar procesos en memoria mientras haya espacio y procesos en cola
+
+            // Verificar si hay procesos nuevos que llegan en el mismo tiempo actual
+            while (true) {
+                Process process_ready = checkIfProcessArrives(); // Verificar si hay procesos que llegan en el mismo tiempo
+                if (process_ready != null) {
+                    System.out.println("Subió el proceso " + process_ready.getId() + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
+                    ready_queue.add(process_ready);
+                    printQueues(); // Imprimir el estado de las colas de procesos después de agregar nuevos procesos
+                } else {
+                    break; // Salir del bucle si no hay más procesos que lleguen en el mismo tiempo
+                }
             }
+
+            Process process_ready = checkIfProcessArrives();
 
             while ((memory_size >= ready_queue.getFirstNodeProcessSize()) && ready_queue.getNode_head() != null) {
                 System.out.println("\nSubió el proceso " + ready_queue.getFirstNodeProcessId() + " y restan "
@@ -149,10 +158,6 @@ public class Main {
             memory_size += running_process.getSize();
             if (process_arrives_aux != null) {
                 process_ready = process_arrives_aux;
-            }
-            if (process_ready != null) {
-                System.out.println("Subió el proceso " + process_ready.getId()
-                        + " a la cola de procesos listos en el tiempo " + process_ready.getArrive_time());
             }
             printQueues();
         }
