@@ -64,7 +64,7 @@ public class Main {
                 return Integer.compare(p1.getArrive_time(),p2.getArrive_time());
             }
         }); // Se ordenan los procesos *creo*
-        System.out.println("Imprimiendo Lista de Procesos Ordenados.");
+        System.out.println("\nImprimiendo Lista de Procesos Ordenados.");
         printArray();
 
         // Se encolan los procesos ordenados de acuerdo a su tiempo de llegada
