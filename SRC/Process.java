@@ -8,6 +8,7 @@ public class Process {
     private int execution_time_remaining; // Tiempo restante de ejecución del proceso
     private int priority; // Prioridad del proceso
     private int arrive_time; // Tiempo de llegada del proceso
+    private int max_wait_time;
     private int first_top;  // Tiempo en el que sube por primera vez
     private int last_execution_time;    // Ultimo tiempo de finalización del proceso
 
@@ -64,6 +65,12 @@ public class Process {
     }
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+    public void setMax_wait_time(int max_wait_time){
+        this.max_wait_time = max_wait_time;
+    }
+    public int getMax_wait_time(){
+        return max_wait_time;
     }
     public int getArrive_time() {
         return arrive_time;
