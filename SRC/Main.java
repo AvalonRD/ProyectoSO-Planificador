@@ -59,10 +59,7 @@ public class Main {
         System.out.println("Imprimiendo Lista de Procesos Ordenados.");
         printArray();
 
-        // Calcular tiempos promedio
-        double totalWaitingTime = 0;
-        double totalResponseTime = 0;
-        double totalTurnaroundTime = 0;
+
 
         Process first_process = sort_array.get(0);
         sort_array.remove(0);
@@ -74,7 +71,7 @@ public class Main {
         System.out.println("Preparando Procesos... ");
 
         while (ready_queue.getNode_head() != null || memory.getNode_head() != null) {
-            
+
             // Ciclo para cargar procesos en memoria mientras haya espacio y procesos en cola
 
             // Verificar si hay procesos nuevos que llegan en el mismo tiempo actual
@@ -132,21 +129,18 @@ public class Main {
                 System.out.println("Proceso " + running_process.getId() + " agregado a la cola de procesos listos.");
             } else {
                 running_process.setLast_execution_time(execution_counter); // Actualiza el tiempo de finalización del
-                                                                           // proceso
+                // proceso
                 running_process.setWaitingTime(
                         execution_counter - running_process.getArrive_time() - running_process.getExecution_time()); // Calcula
-                                                                                                                     // el
-                                                                                                                     // tiempo
-                                                                                                                     // de
-                                                                                                                     // espera
+                // el
+                // tiempo
+                // de
+                // espera
                 running_process.setTurnaroundTime(execution_counter - running_process.getArrive_time()); // Calcula el
-                                                                                                         // tiempo de
-                                                                                                         // ejecución
+                // tiempo de
+                // ejecución
                 System.out.println("Finalizó la ejecución del proceso " + running_process.getId() + " en el tiempo "
                         + execution_counter);
-                totalWaitingTime += running_process.getWaitingTime();
-                totalResponseTime += running_process.getResponseTime();
-                totalTurnaroundTime += running_process.getTurnaroundTime();
 
                 if ((ready_queue.getNode_head() == null && memory.getNode_head() == null) && !sort_array.isEmpty()) {
                     execution_counter = sort_array.get(0).getArrive_time();
@@ -162,15 +156,6 @@ public class Main {
             printQueues();
         }
 
-        double avgWaitingTime = totalWaitingTime / total_processes;
-        double avgResponseTime = totalResponseTime / total_processes;
-        double avgTurnaroundTime = totalTurnaroundTime / total_processes;
-
-        // Imprimir resultados de los tiempos promedio
-        System.out.println("Tiempo de espera promedio: " + avgWaitingTime);
-        System.out.println("Tiempo promedio de respuesta: " + avgResponseTime);
-        System.out.println("Tiempo promedio de ejecución: " + avgTurnaroundTime);
-        System.out.println("NO HAY MAS PROCESOS.");
     }
 
     private static Process checkIfProcessArrives() {
